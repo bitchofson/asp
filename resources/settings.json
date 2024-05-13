@@ -1,0 +1,14 @@
+{
+    "setting": [
+        {
+            "FRONT": 0,
+            "EXTRA": 2
+        },
+        {
+            "RECORD_1": "EXTRA"
+        },
+        {
+            "path_to_save_recording": "resources/output/"
+        }
+    ]
+}
