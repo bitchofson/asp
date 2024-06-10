@@ -1,31 +1,33 @@
-import cv2 as cv
-
+import asyncio
+import asp
 from async_frame_reader.video_async import MultiCameraCapture
-from utils.setting_camera import add_timestamp_to_frame
 from utils.cameras_load import load_cameras
-from detection.background_subtraction import run_detection_mog
+from detection.background_subtraction import BackgroundSubtraction
+from detection.optical_flow import OpticalFlow
 
-def main():
-    path_to_json_setting = 'resources/settings.json'
-
-    settings = load_cameras(path_to_json_setting)['setting']
-
-    captured = MultiCameraCapture(sources=settings[0])
-    
-    
-    while True:
-        for camera_name, cap in captured.captures.items():
-            frame = captured.read_frame(cap)
-            frame = add_timestamp_to_frame(frame=frame)
-
-            if camera_name in settings[1].values():
-                frame = run_detection_mog(frame=frame, pts=captured.pts, path_to_save=settings[2]['path_to_save_recording'])
-
-            cv.imshow(f'{camera_name}', frame)
-        
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
-    cv.destroyAllWindows()
 
 if __name__ == '__main__':
-    main()
+    path_to_json_setting = 'resources/settings.json'
+
+    settings = load_cameras(path_to_json_setting)
+    sources = settings['cameras']
+    records = settings['records']
+    path_to_save = settings['path_to_save_recording']
+    tracking_areas = settings['tracking_areas']
+    detector_types = settings['detector_types']
+
+    captured = MultiCameraCapture(sources=sources)
+
+    camera_processors = {}
+    for record_name, camera_name in records.items():
+        pts = tracking_areas[camera_name]
+        detector_type = detector_types[camera_name]
+        if detector_type == 'opticalflow':
+            camera_processors[camera_name] = OpticalFlow(pts=pts, path_to_save=path_to_save)
+        elif detector_type == 'backgroundsubtraction':
+            camera_processors[camera_name] = BackgroundSubtraction(pts=pts, path_to_save=path_to_save)
+        else:
+            raise ValueError(f"Unknown detector type: {detector_type}")
+
+    app = asp.App(captured, camera_processors)
+    asyncio.run(app.main_loop())

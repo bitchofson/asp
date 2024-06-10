@@ -1,14 +1,44 @@
 {
     "setting": [
         {
-            "FRONT": 0,
-            "EXTRA": 2
+            "cameras": {
+                "EXTRA": "resources/tests/artificalt.mp4"
+            }
         },
         {
-            "RECORD_1": "EXTRA"
+            "records": {
+                "RECORD_1": "EXTRA"
+            }
         },
         {
-            "path_to_save_recording": "resources/output/"
+            "path_to_save_recording": "resources/output/artificalt/"
+        },
+        {
+            "tracking_areas": {
+                "EXTRA": [
+                    [
+                        350,
+                        0
+                    ],
+                    [
+                        1200,
+                        0
+                    ],
+                    [
+                        1200,
+                        700
+                    ],
+                    [
+                        350,
+                        700
+                    ]
+                ]
+            }
+        },
+        {
+            "detector_types": {
+                "EXTRA": "backgroundsubtraction"
+            }
         }
     ]
 }
